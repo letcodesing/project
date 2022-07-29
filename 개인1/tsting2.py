@@ -65,7 +65,7 @@ print(econo_x_pred.shape, democ_x_pred.shape)
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Conv1D, Conv2D, Flatten, Reshape,ReLU, LSTM, GRU, concatenate,Dropout,MaxPooling1D,MaxPooling2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-es = EarlyStopping(monitor='val_loss', patience=200000,mode='auto',restore_best_weights=True,verbose=1)
+es = EarlyStopping(monitor='val_loss', patience=200,mode='auto',restore_best_weights=True,verbose=1)
 mc = ModelCheckpoint('bestmodel.h5',monitor='val_loss',mode='min',save_best_only=True)
 #모델1
 econo = Input(shape=(5,3))
@@ -128,12 +128,12 @@ congress = Dense(4)(congress)
 model = Model(inputs=[econo,democ], outputs=[president,congress],)
 model.summary()
 
-
+model.load_weights('c:/project/개인1/weights.h5')
 
 model.compile(loss=['binary_crossentropy','mse'], optimizer='AdaMax')
-hist = model.fit([econo_x,democ_x],[president_y,congressmember_y],epochs=15000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
+# hist = model.fit([econo_x,democ_x],[president_y,congressmember_y],epochs=15000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
 
-model.save_weights('c:/project/개인1/weights.h5')
+# model.save_weights('c:/project/개인1/weights.h5')
 
 
 loss = model.evaluate([econo_x_test,democ_x_test],[president_y_test,congressmember_y_test])
@@ -143,18 +143,24 @@ pred = model.predict([econo_x_pred,democ_x_pred])
 
 
 print('loss:',loss)
+# print(type(pred))
+print(np.where(pred[0][-1]>=0.5,'27년 대선에서는 야당후보가 당선됩니다','27년 대선에서는 여당후보가 당선됩니다'))
+# print(pred)
+# print(pred[1][-4].round())
+total_congress = pred[1][-4][0].round()+pred[1][-4][1].round()+pred[1][-4][2].round()+pred[1][-4][3].round()
+print('24년 총선에서 민주당계는',pred[1][-4][0].round(),'명,','보수당계는',pred[1][-4][1].round(),'명,','진보당계',pred[1][-4][2].round(),'명,','무소속', pred[1][-4][3].round(),'명이 당선됩니다.')
+print('합계', total_congress,'명')
 
-print(pred)
 # print(pred.shape)
 
-print
+print()
 
 
 import matplotlib.pyplot  as plt
 plt.figure(figsize=(10,10))
-plt.plot(hist.history['loss'])
-plt.plot(hist.history['val_loss'])
+# plt.plot(hist.history['loss'])
+# plt.plot(hist.history['val_loss'])
 # plt.legend()
 # plt.scatter()
-plt.show()
+# plt.show()
 
