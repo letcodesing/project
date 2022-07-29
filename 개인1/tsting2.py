@@ -148,8 +148,8 @@ print(np.where(pred[0][-1]>=0.5,'27년 대선에서는 야당후보가 당선됩
 # print(pred)
 # print(pred[1][-4].round())
 total_congress = pred[1][-4][0].round()+pred[1][-4][1].round()+pred[1][-4][2].round()+pred[1][-4][3].round()
-print('24년 총선에서 민주당계는',pred[1][-4][0].round(),'명,','보수당계는',pred[1][-4][1].round(),'명,','진보당계',pred[1][-4][2].round(),'명,','무소속', pred[1][-4][3].round(),'명이 당선됩니다.')
-print('합계', total_congress,'명')
+print('24년 총선에서 민주당계는',(pred[1][-4][0].round()).astype(int),'명,','보수당계는',(pred[1][-4][1].round()).astype(int),'명,','진보당계',(pred[1][-4][2].round()).astype(int),'명,','무소속', (pred[1][-4][3].round()).astype(int),'명이 당선 됩니다.')
+print('합계', (total_congress).astype(int),'명')
 
 # print(pred.shape)
 
