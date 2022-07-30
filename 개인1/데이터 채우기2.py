@@ -7,19 +7,7 @@ data = pd.read_csv('c:/project/개인1/data.csv',thousands=',',
 
 pd.set_option('display.max_rows',None)
 print(data)
-#21~25 국세 연평균 4.7 성장
-print(data.iloc[55:,0:2])
-data.iloc[55:56,1:2] = data.iloc[54:55,1:2]/100*104.7
-data.iloc[56:57,1:2] = data.iloc[55:56,1:2]/100*104.7
-data.iloc[57:58,1:2] = data.iloc[56:57,1:2]/100*104.7
-data.iloc[58:59,1:2] = data.iloc[57:58,1:2]/100*104.7
-data.iloc[59:60,1:2] = data.iloc[58:59,1:2]/100*104.7
-
-data.iloc[60:61,1:2] = data.iloc[59:60,1:2]
-data.iloc[61:62,1:2] = data.iloc[60:61,1:2]
-print(data.iloc[55:,0:2])
-print(data)
-
+#1966~84
 print(data.iloc[:5,0:2])
 data.iloc[1:2,1:2] = np.mean(data.iloc[0:5,1:2])
 data.iloc[2:3,1:2] = np.mean(data.iloc[0:5,1:2])
@@ -43,6 +31,11 @@ data.iloc[17:18,1:2] = np.mean(data.iloc[14:20,1:2])
 data.iloc[18:19,1:2] = np.mean(data.iloc[14:20,1:2])
 print(data.iloc[14:20,0:2])
 print(data)
+#2026~27
+print(data.iloc[55:,0:2])
+data.iloc[60:61,1:2] = data.iloc[59:60,1:2]
+data.iloc[61:62,1:2] = data.iloc[60:61,1:2]
+print(data.iloc[55:,0:2])
 
 # print(data.shape)
 # print(type(data))
