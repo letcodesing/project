@@ -1,7 +1,7 @@
 import pandas as pd 
 import numpy as np
 
-data = pd.read_csv('c:/project/개인1/data.csv',thousands=',', 
+data = pd.read_csv('c:/project/개인1/데이터/data.csv',thousands=',', 
                 #    index_col=0
                 )
 
@@ -456,7 +456,7 @@ print(type(data))
 print(data.shape)
 
 
-np.save('c:/project/개인1/data2.npy', arr=data)
+np.save('c:/project/개인1/npy, weight 저장/2/data.npy', arr=data)
 """
 
 

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from yaml import ScalarEvent
 
-data = np.load('c:/project/개인1/data2.npy')
+data = np.load('c:/project/개인1/npy, weight 저장/2/data.npy')
 # print(data)
 print(data.shape)
 print(len(data))
@@ -31,19 +31,21 @@ x = split_x(data,5)
 econo_x = x[:-5,:,:3]
 # print(econo_x)
 # print(econo_x.shape)
-econo_x_pred = x[53:,:,:3]
+econo_x_pred = x[31:,:,:3]
 # print(econo_x_test)
 # print(econo_x_test.shape)
 democ_x = x[:-5,:,3:6]
 # print(democ_x)
 # print(democ_x.shape)
-democ_x_pred = x[53:,:,3:6]
+democ_x_pred = x[31:,:,3:6]
 # print(democ_x_test)
 # print(democ_x_test.shape)
 #data에서 그냥 잘라도 되지만 웨이트값 적용을 위해선 트레인과 와꾸가 맞아야하므로 자른다        맞나?
 
 president_y  = data[4:57,7:8]
+president_y_r2  = data[4:57,7:8]
 congressmember_y  = data[4:57,8:]
+congressmember_y_r2  = data[4:57,8:]
 
 from sklearn.model_selection import train_test_split
 econo_x_train, econo_x_test, president_y_train, president_y_test = train_test_split(econo_x, president_y, train_size=0.9, random_state=187)
@@ -128,24 +130,27 @@ congress = Dense(4)(congress)
 model = Model(inputs=[econo,democ], outputs=[president,congress],)
 model.summary()
 
-model.load_weights('c:/project/개인1/weights.h5')
+# model.load_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
 model.compile(loss=['binary_crossentropy','mse'], optimizer='AdaMax')
-# hist = model.fit([econo_x,democ_x],[president_y,congressmember_y],epochs=15000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
+hist = model.fit([econo_x,democ_x],[president_y,congressmember_y],epochs=15000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
 
-# model.save_weights('c:/project/개인1/weights.h5')
+model.save_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
 
 loss = model.evaluate([econo_x_test,democ_x_test],[president_y_test,congressmember_y_test])
 pred = model.predict([econo_x_pred,democ_x_pred])
-# from sklearn.metrics import r2_score
-# r2 = r2_score(  )
 
 
 print('loss:',loss)
 # print(type(pred))
+print(pred)
+from sklearn.metrics import r2_score
+president_r2 = r2_score(president_y[])
+congressmember_r2 = r2_score()
+
+
 print(np.where(pred[0][-1]>=0.5,'27년 대선에서는 야당후보가 당선됩니다','27년 대선에서는 여당후보가 당선됩니다'))
-# print(pred)
 # print(pred[1][-4].round())
 total_congress = pred[1][-4][0].round()+pred[1][-4][1].round()+pred[1][-4][2].round()+pred[1][-4][3].round()
 print('24년 총선에서 민주당계는',(pred[1][-4][0].round()).astype(int),'명,','보수당계는',(pred[1][-4][1].round()).astype(int),'명,','진보당계',(pred[1][-4][2].round()).astype(int),'명,','무소속', (pred[1][-4][3].round()).astype(int),'명이 당선 됩니다.')
