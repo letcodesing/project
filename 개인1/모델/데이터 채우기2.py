@@ -1,7 +1,7 @@
 import pandas as pd 
 import numpy as np
 
-data = pd.read_csv('c:/project/개인1/데이터/data.csv',thousands=',', 
+data = pd.read_csv('https://github.com/letcodesing/project/raw/main/%EA%B0%9C%EC%9D%B81/%EB%8D%B0%EC%9D%B4%ED%84%B0/data.csv',thousands=',', 
                 #    index_col=0
                 )
 

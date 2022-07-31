@@ -15,8 +15,8 @@ Norscaler = Normalizer()
 # print(data)
 data[:,1:2] = Roscaler.fit_transform(data[:,1:2])
 data[:,2:4] = Stanscaler.fit_transform(data[:,2:4])
-data[:,4:5] = Maxscaler.fit_transform(data[:,4:5])
-data[:,6:8] = Minscaler.fit_transform(data[:,6:8])
+data[:,4:5] = Roscaler.fit_transform(data[:,4:5])
+data[:,6:8] = Roscaler.fit_transform(data[:,6:8])
 # print('스케일링 후/',data)
 def split_x(dataset, size):
     aaa = []
@@ -33,21 +33,26 @@ x = split_x(data,5)
 econo_x = x[:-5,:,:3]
 # print(econo_x)
 # print(econo_x.shape)
-econo_x_pred = x[31:,:,:3]
+econo_x_r2 = x[52:57,:,:3]
+econo_x_predic = x[57:,:,:3]
 # print(econo_x_test)
 # print(econo_x_test.shape)
 democ_x = x[:-5,:,3:6]
 # print(democ_x)
 # print(democ_x.shape)
-democ_x_pred = x[31:,:,3:6]
+democ_x_r2 = x[52:57,:,3:6]
+democ_x_predic = x[57:,:,3:6]
 # print(democ_x_test)
 # print(democ_x_test.shape)
 #data에서 그냥 잘라도 되지만 웨이트값 적용을 위해선 트레인과 와꾸가 맞아야하므로 자른다        맞나?
 
 president_y  = data[4:57,7:8]
-president_y_r2  = data[4:57,7:8]
+president_y_r2  = data[52:57,7:8]
+president_y_predic  = data[57:,7:8]
+
 congressmember_y  = data[4:57,8:]
-congressmember_y_r2  = data[4:57,8:]
+congressmember_y_r2  = data[52:57,8:]
+congressmember_y_predic  = data[57:,8:]
 
 from sklearn.model_selection import train_test_split
 econo_x_train, econo_x_test, president_y_train, president_y_test = train_test_split(econo_x, president_y, train_size=0.9, random_state=187)
@@ -63,13 +68,14 @@ democ_x_train, democ_x_test, congressmember_y_train, congressmember_y_test = tra
     
 print(econo_x_train.shape, democ_x_train.shape, econo_x_test.shape, democ_x_test.shape)
 print(president_y_train.shape, president_y_test.shape, congressmember_y_train.shape, congressmember_y_test.shape)
-print(econo_x_pred.shape, democ_x_pred.shape)
+print(econo_x_r2.shape, congressmember_y_r2.shape)
+print(econo_x_predic.shape, congressmember_y_predic.shape)
 #프레지던트 y 시그모이드, 콩그래스멤버 리니어
 #앙상블모델 구성
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Conv1D, Conv2D, Flatten, Reshape,ReLU, LSTM, GRU, concatenate,Dropout,MaxPooling1D,MaxPooling2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-es = EarlyStopping(monitor='val_loss', patience=200,mode='auto',restore_best_weights=True,verbose=1)
+es = EarlyStopping(monitor='val_loss', patience=15000,mode='auto',restore_best_weights=True,verbose=1)
 mc = ModelCheckpoint('bestmodel.h5',monitor='val_loss',mode='min',save_best_only=True)
 #모델1
 econo = Input(shape=(5,3))
@@ -80,6 +86,14 @@ econo = ReLU(2800,5)(econo)
 econo = LSTM(64,activation='relu')(econo)
 # econo = Flatten()(econo)
 econo = Dense(200)(econo)
+econo = Dense(200)(econo)
+econo = Dense(200)(econo)
+econo = Dense(200)(econo)
+econo = Dense(200)(econo)
+econo = Dense(200)(econo)
+econo = Dense(200)(econo)
+econo = Dense(200)(econo)
+econo = Dense(200)(econo)
 econo = Dense(15)(econo)
 econo = Reshape((5,3))(econo)
 # econo  = Flatten()(econo)
@@ -89,6 +103,14 @@ econo = Reshape((5,3))(econo)
 
 #모델2
 democ = Input(shape=(5,3))
+democ = Dense(200)(democ)
+democ = Dense(200)(democ)
+democ = Dense(200)(democ)
+democ = Dense(200)(democ)
+democ = Dense(200)(democ)
+democ = Dense(200)(democ)
+democ = Dense(200)(democ)
+democ = Dense(200)(democ)
 democ = Dense(200)(democ)
 democ = Dense(200)(democ)
 democ = Dense(200)(democ)
@@ -114,6 +136,13 @@ president = Flatten()(president)
 president = Dense(200,activation='tanh')(president)
 president = Dense(200,activation='tanh')(president)
 president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
 president = Dropout(0.2)(president)
 president = Dense(200,activation='elu')(president)
 president = Dense(20)(president)
@@ -122,6 +151,15 @@ president = Dense(1,activation='sigmoid')(president)
 congress = concatenate((econo,democ))
 congress = Conv1D(12,3)(congress)
 congress = Flatten()(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
 congress = Dense(800,activation='relu')(congress)
 congress = Dense(800,activation='relu')(congress)
 congress = Dense(800,activation='relu')(congress)
@@ -134,22 +172,22 @@ model.summary()
 
 # model.load_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
-model.compile(loss=['binary_crossentropy','mse'], optimizer='AdaMax')
-hist = model.fit([econo_x,democ_x],[president_y,congressmember_y],epochs=15000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
+model.compile(loss=['binary_crossentropy','mae'], optimizer='AdaMax')
+hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=15000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
 
 model.save_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
 
 loss = model.evaluate([econo_x_test,democ_x_test],[president_y_test,congressmember_y_test])
-pred = model.predict([econo_x_pred,democ_x_pred])
+presi_r2,congress_r2 = model.predict([econo_x_r2, democ_x_r2])
 
 
 print('loss:',loss)
 # print(type(pred))
-print(pred)
 from sklearn.metrics import r2_score
-president_r2 = r2_score(president_y[])
-congressmember_r2 = r2_score()
+presi_r2_score = r2_score(president_y_r2,presi_r2)
+congress_r2_score = r2_score(congressmember_y_r2,congress_r2)
+print(f'r2',presi_r2_score,congress_r2_score)
 
 
 print(np.where(pred[0][-1]>=0.5,'27년 대선에서는 야당후보가 당선됩니다','27년 대선에서는 여당후보가 당선됩니다'))
