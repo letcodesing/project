@@ -7,63 +7,29 @@ data = pd.read_csv('c:/project/개인1/데이터/data.csv',thousands=',',
 
 pd.set_option('display.max_rows',None)
 print(data)
+#국세수입
 #1966~84
 print(data.iloc[:5,0:2])
-data.iloc[1:2,1:2] = np.mean(data.iloc[0:5,1:2])
-data.iloc[2:3,1:2] = np.mean(data.iloc[0:5,1:2])
-data.iloc[3:4,1:2] = np.mean(data.iloc[0:5,1:2])
+data.loc[1:3,['국세/단위 억원']] = data.loc[1:3,['국세/단위 억원']].fillna(data.loc[[0,4],['국세/단위 억원']].mean())
 print(data.iloc[:5,0:2])
 print(data.iloc[4:15,0:2])
-data.iloc[5:6,1:2] = np.mean(data.iloc[4:15,1:2])
-data.iloc[6:7,1:2] = np.mean(data.iloc[4:15,1:2])
-data.iloc[7:8,1:2] = np.mean(data.iloc[4:15,1:2])
-data.iloc[8:9,1:2] = np.mean(data.iloc[4:15,1:2])
-data.iloc[9:10,1:2] = np.mean(data.iloc[4:15,1:2])
-data.iloc[10:11,1:2] = np.mean(data.iloc[4:15,1:2])
-data.iloc[11:12,1:2] = np.mean(data.iloc[4:15,1:2])
-data.iloc[12:13,1:2] = np.mean(data.iloc[4:15,1:2])
-data.iloc[13:14,1:2] = np.mean(data.iloc[4:15,1:2])
+data.loc[5:13,['국세/단위 억원']] = data.loc[5:13,['국세/단위 억원']].fillna(data.loc[[4,14],['국세/단위 억원']].mean())
 print(data.iloc[4:15,0:2])
 print(data.iloc[14:20,0:2])
-data.iloc[15:16,1:2] = np.mean(data.iloc[14:20,1:2])
-data.iloc[16:17,1:2] = np.mean(data.iloc[14:20,1:2])
-data.iloc[17:18,1:2] = np.mean(data.iloc[14:20,1:2])
-data.iloc[18:19,1:2] = np.mean(data.iloc[14:20,1:2])
+data.loc[15:18,['국세/단위 억원']] = data.loc[15:18,['국세/단위 억원']].fillna(data.loc[[14,19],['국세/단위 억원']].mean())
 print(data.iloc[14:20,0:2])
-print(data)
 #2026~27
 print(data.iloc[55:,0:2])
 data.iloc[60:61,1:2] = data.iloc[59:60,1:2]
 data.iloc[61:62,1:2] = data.iloc[60:61,1:2]
 print(data.iloc[55:,0:2])
 
-# print(data.shape)
-# print(type(data))
+#성장률, 물가상승률 평균 채우기
+print(data.loc[[57,58,59,60,61],['성장률','물가 상승률']])
+data.loc[58:60,['성장률','물가 상승률']] = data.loc[58:60,['성장률','물가 상승률']].fillna(data.loc[[57,61],['성장률','물가 상승률']].mean())
+print(data.loc[[57,58,59,60,61],['성장률','물가 상승률']])
 
-#성장률 평균 채우기
-print(data.iloc[57:62,:3])
-data.iloc[58:59,2:3] = np.mean(data.iloc[57:62,2:3])
-data.iloc[59:60,2:3] = np.mean(data.iloc[57:62,2:3])
-data.iloc[60:61,2:3] = np.mean(data.iloc[57:62,2:3])
-print(data.iloc[57:62,:3])
-#물가 상승률
-print(data.iloc[57:62,:4])
-data.iloc[58:59,3:4] = np.mean(data.iloc[57:62,3:4])
-data.iloc[59:60,3:4] = np.mean(data.iloc[57:62,3:4])
-data.iloc[60:61,3:4] = np.mean(data.iloc[57:62,3:4])
-print(data.iloc[57:62,:4])
-print(data)
-
-# from scipy import interpolate
-# x = data.iloc[:,1:4]
-# y = data['언론자유도']
-# f1 = interpolate.interp1d(x,y)
-# # f2 = interpolate.interp1d(x,y,)
-
-
-#국세,성장률, 물가상승률에 따른 언론 자유도
-# data['언론자유도'] = pd.DataFrame.interpolate(data['언론자유도'],method='linear',axis=1,limit=None, limit_direction='forward',                         limit_area=None)
-
+#언론자유도
 from sklearn import linear_model
 reg_lin = linear_model.LinearRegression()
 x = data.iloc[27:51,2:4]
@@ -71,8 +37,6 @@ y = data['언론자유도']
 y = y.dropna()
 print(x.shape, y.shape)
 reg_lin.fit(x,y)  
-# pressfree = reg_lin.predict(data.iloc[:27,2:4])
-# print(pressfree.shape)
 print(data['언론자유도'])
 data.iloc[0:1,4:5] = reg_lin.predict(data.iloc[0:1,2:4])
 data.iloc[1:2,4:5] = reg_lin.predict(data.iloc[1:2,2:4])
@@ -120,6 +84,7 @@ print(data)
 
 data.loc[data['언론자유도']<10,'언론자유도'] = 10
 print(data)
+
 #대통령 여/야
 data.iloc[0:26,7:8] = 0
 data.iloc[32:36,7:8] = 0
@@ -161,12 +126,14 @@ print(data)
 #남은것 대통령,국회으원 투표율, y값 전부 평균채움 예정
 print(data['대통령 투표율'])
 data.iloc[0:1,5:6] = data.iloc[1:2,5:6]
-
 data.iloc[2:3,5:6] = np.mean(data.iloc[1:6,5:6])
 data.iloc[3:4,5:6] = np.mean(data.iloc[1:6,5:6])
 data.iloc[4:5,5:6] = np.mean(data.iloc[1:6,5:6])
 
+
 print(data.iloc[5:22,5:6])
+
+
 data.iloc[6:7,5:6] = np.mean(data.iloc[5:22,5:6])
 data.iloc[7:8,5:6] = np.mean(data.iloc[5:22,5:6])
 data.iloc[8:9,5:6] = np.mean(data.iloc[5:22,5:6])
@@ -240,192 +207,43 @@ data.iloc[59:60,5:6] = data.iloc[56:57,5:6]
 data.iloc[60:61,5:6] = data.iloc[56:57,5:6]
 data.iloc[61:62,5:6] = data.iloc[56:57,5:6]
 print(data.iloc[56:62,5:6])
-#대통령 투표율 완료 국회의원 투표율
-
-print(data['국회의원 투표율'])
+#대통령 투표율 완료 국회의원 투표율 및 분류별 국회의원 수
 data.iloc[0:1,6:7] = data.iloc[1:2,6:7]
+data.iloc[0:1,8:] = data.iloc[1:2,8:]
+print(data.loc[:,['국회의원 투표율','민주당계','보수당계','진보당계','무소속']])
+data.loc[[2,3,4],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[2,3,4],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[1,5],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-data.iloc[2:3,6:7] = np.mean(data.iloc[1:6,6:7])
-data.iloc[3:4,6:7] = np.mean(data.iloc[1:6,6:7])
-data.iloc[4:5,6:7] = np.mean(data.iloc[1:6,6:7])
-print(data.iloc[1:6,6:7])
+data.loc[[6],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[6],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[5,7],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[5:8,6:7])
-data.iloc[6:7,6:7] = np.mean(data.iloc[5:8,6:7])
-print(data.iloc[5:8,6:7])
+data.loc[[8,9,10,11],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[8,9,10,11],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[7,12],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[7:13,6:7])
-data.iloc[8:9,6:7] = np.mean(data.iloc[7:13,6:7])
-data.iloc[9:10,6:7] = np.mean(data.iloc[7:13,6:7])
-data.iloc[10:11,6:7] = np.mean(data.iloc[7:13,6:7])
-data.iloc[11:12,6:7] = np.mean(data.iloc[7:13,6:7])
-print(data.iloc[7:13,6:7])
+data.loc[[13,14],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[13,14],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[12,15],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[12:16,6:7])
-data.iloc[13:14,6:7] = np.mean(data.iloc[12:16,6:7])
-data.iloc[14:15,6:7] = np.mean(data.iloc[12:16,6:7])
-print(data.iloc[12:16,6:7])
+data.loc[[16,17,18],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[16,17,18],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[15,19],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[15:20,6:7])
-data.iloc[16:17,6:7] = np.mean(data.iloc[15:20,6:7])
-data.iloc[17:18,6:7] = np.mean(data.iloc[15:20,6:7])
-data.iloc[18:19,6:7] = np.mean(data.iloc[15:20,6:7])
-print(data.iloc[15:20,6:7])
+data.loc[[20,21],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[20,21],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[19,22],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[19:23,6:7])
-data.iloc[20:21,6:7] = np.mean(data.iloc[19:23,6:7])
-data.iloc[21:22,6:7] = np.mean(data.iloc[19:23,6:7])
-print(data.iloc[19:23,6:7])
+data.loc[[23,24,25],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[23,24,25],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[22,26],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[22:27,6:7])
-data.iloc[23:24,6:7] = np.mean(data.iloc[22:27,6:7])
-data.iloc[24:25,6:7] = np.mean(data.iloc[22:27,6:7])
-data.iloc[25:26,6:7] = np.mean(data.iloc[22:27,6:7])
-print(data.iloc[22:27,6:7])
+data.loc[[27,28,29],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[27,28,29],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[26,30],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[26:31,6:7])
-data.iloc[27:28,6:7] = np.mean(data.iloc[26:31,6:7])
-data.iloc[28:29,6:7] = np.mean(data.iloc[26:31,6:7])
-data.iloc[29:30,6:7] = np.mean(data.iloc[26:31,6:7])
-print(data.iloc[26:31,6:7])
+data.loc[[31,32,33],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[31,32,33],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[30,34],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[30:35,6:7])
-data.iloc[31:32,6:7] = np.mean(data.iloc[30:35,6:7])
-data.iloc[32:33,6:7] = np.mean(data.iloc[30:35,6:7])
-data.iloc[33:34,6:7] = np.mean(data.iloc[30:35,6:7])
-print(data.iloc[30:35,6:7])
+data.loc[[35,36,37],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[35,36,37],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[34,38],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[34:39,6:7])
-data.iloc[35:36,6:7] = np.mean(data.iloc[34:39,6:7])
-data.iloc[36:37,6:7] = np.mean(data.iloc[34:39,6:7])
-data.iloc[37:38,6:7] = np.mean(data.iloc[34:39,6:7])
-print(data.iloc[34:39,6:7])
+data.loc[[39,40,41],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[39,40,41],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[38,42],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[38:43,6:7])
-data.iloc[39:40,6:7] = np.mean(data.iloc[38:43,6:7])
-data.iloc[40:41,6:7] = np.mean(data.iloc[38:43,6:7])
-data.iloc[41:42,6:7] = np.mean(data.iloc[38:43,6:7])
-print(data.iloc[38:43,6:7])
+data.loc[[43,44,45],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[43,44,45],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[42,46],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[42:47,6:7])
-data.iloc[43:44,6:7] = np.mean(data.iloc[42:47,6:7])
-data.iloc[44:45,6:7] = np.mean(data.iloc[42:47,6:7])
-data.iloc[45:46,6:7] = np.mean(data.iloc[42:47,6:7])
-print(data.iloc[42:47,6:7])
+data.loc[[47,48,49],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[47,48,49],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[46,50],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[46:51,6:7])
-data.iloc[47:48,6:7] = np.mean(data.iloc[46:51,6:7])
-data.iloc[48:49,6:7] = np.mean(data.iloc[46:51,6:7])
-data.iloc[49:50,6:7] = np.mean(data.iloc[46:51,6:7])
-print(data.iloc[46:51,6:7])
+data.loc[[51,52,53],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']] = data.loc[[51,52,53],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[50,54],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
-print(data.iloc[50:55,6:7])
-data.iloc[51:52,6:7] = np.mean(data.iloc[50:55,6:7])
-data.iloc[52:53,6:7] = np.mean(data.iloc[50:55,6:7])
-data.iloc[53:54,6:7] = np.mean(data.iloc[50:55,6:7])
-print(data.iloc[50:55,6:7])
-
-print(data.iloc[54:,6:7])
-data.iloc[55:56,6:7] = data.iloc[54:55,6:7]
-data.iloc[56:57,6:7] = data.iloc[54:55,6:7]
-data.iloc[57:58,6:7] = data.iloc[54:55,6:7]
-data.iloc[58:59,6:7] = data.iloc[54:55,6:7]
-data.iloc[59:60,6:7] = data.iloc[54:55,6:7]
-data.iloc[60:61,6:7] = data.iloc[54:55,6:7]
-data.iloc[61:,6:7] = data.iloc[54:55,6:7]
-print(data.iloc[54:,6:7])
-
-# 투표율 완료 y값
+data.loc[55:,['국회의원 투표율']] = data.loc[55:,['국회의원 투표율']].fillna(data.loc[[54],['국회의원 투표율']].mean())
+data.loc[55:56,['민주당계','보수당계','진보당계','무소속']] = data.loc[55:56,['민주당계','보수당계','진보당계','무소속']].fillna(data.loc[[54],['국회의원 투표율','민주당계','보수당계','진보당계','무소속']].mean())
 
 
-#국회의원수
-data.iloc[:1,8:] = data.iloc[1:2,8:]
-# print(data)
-print(data.iloc[1:8,8:])
-data.iloc[2:3,8:] = np.mean(data.iloc[1:8,8:])
-data.iloc[3:4,8:] = np.mean(data.iloc[1:8,8:])
-data.iloc[4:5,8:] = np.mean(data.iloc[1:8,8:])
-data.iloc[5:6,8:] = np.mean(data.iloc[1:8,8:])
-data.iloc[6:7,8:] = np.mean(data.iloc[1:8,8:])
-print(data.iloc[1:8,8:])
-
-print(data.iloc[7:13,8:])
-data.iloc[8:9,8:] = np.mean(data.iloc[7:13,8:])
-data.iloc[9:10,8:] = np.mean(data.iloc[7:13,8:])
-data.iloc[10:11,8:] = np.mean(data.iloc[7:13,8:])
-data.iloc[11:12,8:] = np.mean(data.iloc[7:13,8:])
-print(data.iloc[7:13,8:])
-
-print(data.iloc[12:16,8:])
-data.iloc[13:14,8:] = np.mean(data.iloc[12:16,8:])
-data.iloc[14:15,8:] = np.mean(data.iloc[12:16,8:])
-print(data.iloc[12:16,8:])
-
-print(data.iloc[15:20,8:])
-data.iloc[16:17,8:] = np.mean(data.iloc[15:20,8:])
-data.iloc[17:18,8:] = np.mean(data.iloc[15:20,8:])
-data.iloc[18:19,8:] = np.mean(data.iloc[15:20,8:])
-print(data.iloc[15:20,8:])
-
-print(data.iloc[19:23,8:])
-data.iloc[20:21,8:] = np.mean(data.iloc[19:23,8:])
-data.iloc[21:22,8:] = np.mean(data.iloc[19:23,8:])
-print(data.iloc[19:23,8:])
-
-print(data.iloc[22:27,8:])
-data.iloc[23:24,8:] = np.mean(data.iloc[22:27,8:])
-data.iloc[24:25,8:] = np.mean(data.iloc[22:27,8:])
-data.iloc[25:26,8:] = np.mean(data.iloc[22:27,8:])
-print(data.iloc[22:27,8:])
-
-print(data.iloc[26:31,8:])
-data.iloc[27:28,8:] = np.mean(data.iloc[26:31,8:])
-data.iloc[28:29,8:] = np.mean(data.iloc[26:31,8:])
-data.iloc[29:30,8:] = np.mean(data.iloc[26:31,8:])
-print(data.iloc[26:31,8:])
-
-print(data.iloc[30:35,8:])
-data.iloc[31:32,8:] = np.mean(data.iloc[30:35,8:])
-data.iloc[32:33,8:] = np.mean(data.iloc[30:35,8:])
-data.iloc[33:34,8:] = np.mean(data.iloc[30:35,8:])
-print(data.iloc[30:35,8:])
-
-print(data.iloc[34:39,8:])
-data.iloc[35:36,8:] = np.mean(data.iloc[34:39,8:])
-data.iloc[36:37,8:] = np.mean(data.iloc[34:39,8:])
-data.iloc[37:38,8:] = np.mean(data.iloc[34:39,8:])
-print(data.iloc[34:39,8:])
-
-print(data.iloc[38:43,8:])
-data.iloc[39:40,8:] = np.mean(data.iloc[38:43,8:])
-data.iloc[40:41,8:] = np.mean(data.iloc[38:43,8:])
-data.iloc[41:42,8:] = np.mean(data.iloc[38:43,8:])
-print(data.iloc[38:43,8:])
-
-print(data.iloc[42:47,8:])
-data.iloc[43:44,8:] = np.mean(data.iloc[42:47,8:])
-data.iloc[44:45,8:] = np.mean(data.iloc[42:47,8:])
-data.iloc[45:46,8:] = np.mean(data.iloc[42:47,8:])
-print(data.iloc[42:47,8:])
-
-print(data.iloc[46:51,8:])
-data.iloc[47:48,8:] = np.mean(data.iloc[46:51,8:])
-data.iloc[48:49,8:] = np.mean(data.iloc[46:51,8:])
-data.iloc[49:50,8:] = np.mean(data.iloc[46:51,8:])
-print(data.iloc[46:51,8:])
-
-print(data.iloc[50:55,8:])
-data.iloc[51:52,8:] = np.mean(data.iloc[50:55,8:])
-data.iloc[52:53,8:] = np.mean(data.iloc[50:55,8:])
-data.iloc[53:54,8:] = np.mean(data.iloc[50:55,8:])
-print(data.iloc[50:55,8:])
-
-print(data.iloc[54:,8:])
-data.iloc[55:57,8:] = data.iloc[54:55,8:]
-print(data.iloc[54:,8:])
-
-print(data.isnull().sum())
-print(data)
+print(data.loc[:,['국회의원 투표율','민주당계','보수당계','진보당계','무소속']])
 #x,y 완성 23~ 서브미션 그 이하 트레인
 # 경제, 민주화로 앙상블모델
 #y는 시계열로 자른다음 나오게 된다

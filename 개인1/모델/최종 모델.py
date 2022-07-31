@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from yaml import ScalarEvent
+
 
 data = np.load('c:/project/개인1/npy, weight 저장/2/data.npy')
 # print(data)
@@ -25,6 +25,8 @@ def split_x(dataset, size):
         aaa.append(subset)
     print(type(aaa))
     return np.array(aaa)
+
+
 x = split_x(data,5)
 # print(x)
 # print(x.shape)
