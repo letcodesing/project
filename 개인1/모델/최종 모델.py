@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-
+import tensorflow as tf            
+tf.random.set_seed(1987)    
 
 data = np.load('c:/project/개인1/npy, weight 저장/2/data.npy')
 # print(data)
@@ -15,8 +16,8 @@ Norscaler = Normalizer()
 # print(data)
 data[:,1:2] = Roscaler.fit_transform(data[:,1:2])
 data[:,2:4] = Stanscaler.fit_transform(data[:,2:4])
-data[:,4:5] = Roscaler.fit_transform(data[:,4:5])
-data[:,6:8] = Roscaler.fit_transform(data[:,6:8])
+data[:,4:5] = Maxscaler.fit_transform(data[:,4:5])
+data[:,6:8] = Minscaler.fit_transform(data[:,6:8])
 # print('스케일링 후/',data)
 def split_x(dataset, size):
     aaa = []
@@ -75,7 +76,7 @@ print(econo_x_predic.shape, congressmember_y_predic.shape)
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Conv1D, Conv2D, Flatten, Reshape,ReLU, LSTM, GRU, concatenate,Dropout,MaxPooling1D,MaxPooling2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-es = EarlyStopping(monitor='val_loss', patience=15000,mode='auto',restore_best_weights=True,verbose=1)
+es = EarlyStopping(monitor='val_loss', patience=50000,mode='auto',restore_best_weights=True,verbose=1)
 mc = ModelCheckpoint('bestmodel.h5',monitor='val_loss',mode='min',save_best_only=True)
 #모델1
 econo = Input(shape=(5,3))
@@ -89,11 +90,6 @@ econo = Dense(200)(econo)
 econo = Dense(200)(econo)
 econo = Dense(200)(econo)
 econo = Dense(200)(econo)
-econo = Dense(200)(econo)
-econo = Dense(200)(econo)
-econo = Dense(200)(econo)
-econo = Dense(200)(econo)
-econo = Dense(200)(econo)
 econo = Dense(15)(econo)
 econo = Reshape((5,3))(econo)
 # econo  = Flatten()(econo)
@@ -103,14 +99,6 @@ econo = Reshape((5,3))(econo)
 
 #모델2
 democ = Input(shape=(5,3))
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
 democ = Dense(200)(democ)
 democ = Dense(200)(democ)
 democ = Dense(200)(democ)
@@ -135,14 +123,6 @@ president = Conv1D(12,3)(president)
 president = Flatten()(president)
 president = Dense(200,activation='tanh')(president)
 president = Dense(200,activation='tanh')(president)
-president = Dense(200,activation='tanh')(president)
-president = Dense(200,activation='tanh')(president)
-president = Dense(200,activation='tanh')(president)
-president = Dense(200,activation='tanh')(president)
-president = Dense(200,activation='tanh')(president)
-president = Dense(200,activation='tanh')(president)
-president = Dense(200,activation='tanh')(president)
-president = Dense(200,activation='tanh')(president)
 president = Dropout(0.2)(president)
 president = Dense(200,activation='elu')(president)
 president = Dense(20)(president)
@@ -151,16 +131,6 @@ president = Dense(1,activation='sigmoid')(president)
 congress = concatenate((econo,democ))
 congress = Conv1D(12,3)(congress)
 congress = Flatten()(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
 congress = Dense(800,activation='relu')(congress)
 congress = Dense(800,activation='relu')(congress)
 congress = Dropout(0.4)(congress)
@@ -172,22 +142,27 @@ model.summary()
 
 # model.load_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
-model.compile(loss=['binary_crossentropy','mae'], optimizer='AdaMax')
-hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=15000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
+model.compile(loss=['binary_crossentropy','mse'], optimizer='AdaMax')
+hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=50000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
 
 model.save_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
 
 loss = model.evaluate([econo_x_test,democ_x_test],[president_y_test,congressmember_y_test])
-presi_r2,congress_r2 = model.predict([econo_x_r2, democ_x_r2])
+pred = model.predict([econo_x_r2, democ_x_r2])
 
-
-print('loss:',loss)
-# print(type(pred))
 from sklearn.metrics import r2_score
-presi_r2_score = r2_score(president_y_r2,presi_r2)
-congress_r2_score = r2_score(congressmember_y_r2,congress_r2)
+print(pred[0])
+print(president_y_r2)
+presi_r2_score = r2_score(president_y_r2,pred[0].round())
+print(pred[1])
+congress_r2_score = r2_score(congressmember_y_r2,pred[1].round())
 print(f'r2',presi_r2_score,congress_r2_score)
+# print(pred.shape)
+# print(presi_r2_score)
+# result = round(pred)
+# print(np.round(pred,))
+print('loss:',loss)
 
 
 print(np.where(pred[0][-1]>=0.5,'27년 대선에서는 야당후보가 당선됩니다','27년 대선에서는 여당후보가 당선됩니다'))
