@@ -72,11 +72,6 @@ data.iloc[53:54,4:5] = reg_lin.predict(data.iloc[53:54,2:4])
 data.iloc[54:55,4:5] = reg_lin.predict(data.iloc[54:55,2:4])
 data.iloc[55:56,4:5] = reg_lin.predict(data.iloc[55:56,2:4])
 data.iloc[56:57,4:5] = reg_lin.predict(data.iloc[56:57,2:4])
-data.iloc[57:58,4:5] = reg_lin.predict(data.iloc[57:58,2:4])
-data.iloc[58:59,4:5] = reg_lin.predict(data.iloc[58:59,2:4])
-data.iloc[59:60,4:5] = reg_lin.predict(data.iloc[59:60,2:4])
-data.iloc[60:61,4:5] = reg_lin.predict(data.iloc[60:61,2:4])
-data.iloc[61:62,4:5] = reg_lin.predict(data.iloc[61:62,2:4])
 
 # print(data['언론자유도'])
 # print(data.columns)
@@ -270,10 +265,11 @@ print(data.loc[:,['국회의원 투표율','민주당계','보수당계','진보
 # data[:,4:5] = Maxscaler.fit_transform(data[:,4:5])
 # data[:,6:8] = Minscaler.fit_transform(data[:,6:8])
 
-print(data)
 print(type(data))
 data = data.values
 print(type(data))
+data = data[:-5,:]
+print(data)
 print(data.shape)
 
 
