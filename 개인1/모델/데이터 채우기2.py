@@ -35,8 +35,8 @@ reg_lin = linear_model.LinearRegression()
 x = data.iloc[27:51,2:4]
 y = data['언론자유도']
 y = y.dropna()
-print(x.shape, y.shape)
 reg_lin.fit(x,y)  
+print(x.shape, y.shape)
 print(data['언론자유도'])
 data.iloc[0:1,4:5] = reg_lin.predict(data.iloc[0:1,2:4])
 data.iloc[1:2,4:5] = reg_lin.predict(data.iloc[1:2,2:4])

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from yaml import ScalarEvent
 
-data = np.load('c:/project/개인1/data.npy')
+data = np.load('c:/project/개인1/npy, weight 저장/2/data.npy')
 # print(data)
 print(data.shape)
 print(len(data))
@@ -131,7 +131,7 @@ model.summary()
 
 
 model.compile(loss=['binary_crossentropy','mse'], optimizer='AdaMax')
-hist = model.fit([econo_x,democ_x],[president_y,congressmember_y],epochs=15000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
+hist = model.fit([econo_x,democ_x],[president_y,congressmember_y],epochs=300,batch_size=10, validation_split=0.1, callbacks=[es,mc])
 
 model.save_weights('c:/project/개인1/weights.h5')
 

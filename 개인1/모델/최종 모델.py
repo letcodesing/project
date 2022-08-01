@@ -56,8 +56,8 @@ congressmember_y_r2  = data[52:57,8:]
 congressmember_y_predic  = data[57:,8:]
 
 from sklearn.model_selection import train_test_split
-econo_x_train, econo_x_test, president_y_train, president_y_test = train_test_split(econo_x, president_y, train_size=0.9, random_state=187)
-democ_x_train, democ_x_test, congressmember_y_train, congressmember_y_test = train_test_split(econo_x, president_y, train_size=0.9, random_state=187)
+econo_x_train, econo_x_test, president_y_train, president_y_test = train_test_split(econo_x, president_y, train_size=0.99, random_state=187)
+democ_x_train, democ_x_test, congressmember_y_train, congressmember_y_test = train_test_split(econo_x, president_y, train_size=0.99, random_state=187)
 # print(president_y)
 # print(president_y.shape)
 # print(congressmember_y)
@@ -76,7 +76,7 @@ print(econo_x_predic.shape, congressmember_y_predic.shape)
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Conv1D, Conv2D, Flatten, Reshape,ReLU, LSTM, GRU, concatenate,Dropout,MaxPooling1D,MaxPooling2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-es = EarlyStopping(monitor='val_loss', patience=50000,mode='auto',restore_best_weights=True,verbose=1)
+es = EarlyStopping(monitor='val_loss', patience=300,mode='auto',restore_best_weights=True,verbose=1)
 mc = ModelCheckpoint('bestmodel.h5',monitor='val_loss',mode='min',save_best_only=True)
 #모델1
 econo = Input(shape=(5,3))
@@ -86,10 +86,10 @@ econo = Reshape((75,1))(econo)
 econo = ReLU(2800,5)(econo)
 econo = LSTM(64,activation='relu')(econo)
 # econo = Flatten()(econo)
-econo = Dense(200)(econo)
-econo = Dense(200)(econo)
-econo = Dense(200)(econo)
-econo = Dense(200)(econo)
+econo = Dense(200,activation='relu')(econo)
+econo = Dense(200,activation='relu')(econo)
+econo = Dense(200,activation='relu')(econo)
+econo = Dense(200,activation='relu')(econo)
 econo = Dense(15)(econo)
 econo = Reshape((5,3))(econo)
 # econo  = Flatten()(econo)
@@ -99,9 +99,9 @@ econo = Reshape((5,3))(econo)
 
 #모델2
 democ = Input(shape=(5,3))
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
-democ = Dense(200)(democ)
+democ = Dense(200,activation='relu')(democ)
+democ = Dense(200,activation='relu')(democ)
+democ = Dense(200,activation='relu')(democ)
 democ = Dense(15)(democ)
 democ = Reshape((75,1))(democ)
 democ = ReLU(28,10)(democ)
@@ -131,8 +131,8 @@ president = Dense(1,activation='sigmoid')(president)
 congress = concatenate((econo,democ))
 congress = Conv1D(12,3)(congress)
 congress = Flatten()(congress)
-congress = Dense(800,activation='relu')(congress)
-congress = Dense(800,activation='relu')(congress)
+congress = Dense(8000,activation='relu')(congress)
+congress = Dense(8000,activation='relu')(congress)
 congress = Dropout(0.4)(congress)
 congress = Dense(80)(congress)
 congress = Dense(4)(congress)
@@ -143,7 +143,7 @@ model.summary()
 # model.load_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
 model.compile(loss=['binary_crossentropy','mse'], optimizer='AdaMax')
-hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=50000,batch_size=10, validation_split=0.1, callbacks=[es,mc])
+hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=500,batch_size=10, validation_split=0.1, callbacks=[es,mc])
 
 model.save_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
