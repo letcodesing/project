@@ -128,7 +128,7 @@ democ_x_pred = democ_x_pred.numpy()
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Conv1D, Conv2D, Flatten, Reshape,ReLU, LSTM, GRU, concatenate,Dropout,MaxPooling1D,MaxPooling2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-es = EarlyStopping(monitor='val_loss', patience=5000,mode='auto',restore_best_weights=True,verbose=1)
+es = EarlyStopping(monitor='val_loss', patience=300,mode='auto',restore_best_weights=True,verbose=1)
 mc = ModelCheckpoint('c:/project/개인1/npy, weight 저장/2/bestmodel.hdf5',monitor='val_loss',mode='min',save_best_only=True)
 #모델1
 econo = Input(shape=(5,150))
@@ -176,9 +176,9 @@ president = Dense(200,activation='tanh')(president)
 president = Dense(200,activation='tanh')(president)
 president = Dropout(0.2)(president)
 president = Dense(200,activation='elu')(president)
-president = Dense(60)(president)
-president = Reshape((3,20))(president)
-president = GRU(1,activation='sigmoid')(president)
+president = Dense(100)(president)
+president = Reshape((5,20))(president)
+president = LSTM(1,return_sequences=True,activation='sigmoid')(president)
 
 congress = concatenate((econo,democ))
 congress = LSTM(80)(congress)
@@ -193,14 +193,14 @@ congress = LSTM(4,return_sequences=True,activation='relu')(congress)
 model = Model(inputs=[econo,democ], outputs=[president,congress],)
 model.summary()
 
-# model.load_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
+model.load_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
 model.compile(loss=['binary_crossentropy','mae'], optimizer='AdaMax')
-hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=30000,batch_size=10, 
-                 validation_split=0.1,
-                 callbacks=[es,mc])
+# hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=30000,batch_size=10, 
+#                  validation_split=0.1,
+#                  callbacks=[es,mc])
 
-model.save_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
+# model.save_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
 
 
 loss = model.evaluate([econo_x_test,democ_x_test],[president_y_test,congressmember_y_test])
@@ -211,7 +211,23 @@ pred_presi, pred_congress = model.predict([econo_x_pred,democ_x_pred])
 print(pred_presi)
 print('=============')
 print(pred_congress)
-# from sklearn.metrics import accuracy_score, r2_score
+from sklearn.metrics import accuracy_score, r2_score
+presi_r2, congress_r2 = model.predict([econo_x_test,democ_x_test])
+print(president_y_test)
+print(congress_r2)
+# presi_r2 = np.where(presi_r2<7,0,1).astype(int)
+# presi_r2 = np.argmax(presi_r2,axis=1)
+presi_r2[(presi_r2<7)] = 0 
+presi_r2[(presi_r2>=7)] = 1 
+
+presi_r2 = np.array(presi_r2)
+print(type(presi_r2),type(president_y_test))
+
+# presi_r2 = pd.DataFrame(presi_r2, dtype='int64')
+print(presi_r2)
+presi_acc_score = accuracy_score(president_y_test,presi_r2)
+
+print(presi_acc_score)
 # # print(pred0[0])
 # # print(president_y_r2)
 # # pred_presi = np.where(pred0[0]>0.5,1,0)
@@ -219,7 +235,6 @@ print(pred_congress)
 # print(pred_presi.shape)
 # pred_presi = pred_presi.reshape(10,5,1)
 # pred_presi = np.array(pred_presi)
-# # presi_acc_score = accuracy_score(president_y_test,pred_presi)
 # # # print(pred0[1])
 # # print(congressmember_y_test)
 # # pred_congress = pred0[1]
