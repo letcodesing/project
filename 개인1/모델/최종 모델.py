@@ -103,24 +103,24 @@ print(president_y_train.shape, president_y_test.shape, congressmember_y_train.sh
 import torch
 from torch import nn
 import torch.nn.functional as F
-# econo_x_train = torch.from_numpy(econo_x_train)
-# econo_x_test = torch.from_numpy(econo_x_test)
-# econo_x_pred = torch.from_numpy(econo_x_pred)
-# democ_x_train = torch.from_numpy(democ_x_train)
-# democ_x_test = torch.from_numpy(democ_x_test)
-# democ_x_pred = torch.from_numpy(democ_x_pred)
+econo_x_train = torch.tensor(econo_x_train)
+econo_x_test = torch.tensor(econo_x_test)
+econo_x_pred = torch.tensor(econo_x_pred)
+democ_x_train = torch.tensor(democ_x_train)
+democ_x_test = torch.tensor(democ_x_test)
+democ_x_pred = torch.tensor(democ_x_pred)
 econo_x_train = F.interpolate(econo_x_train, scale_factor=50, mode='linear')
 econo_x_test = F.interpolate(econo_x_test, scale_factor=50, mode='linear')
 econo_x_pred = F.interpolate(econo_x_pred, scale_factor=50, mode='linear')
 democ_x_train = F.interpolate(democ_x_train, scale_factor=50, mode='linear')
 democ_x_test = F.interpolate(democ_x_test, scale_factor=50, mode='linear')
 democ_x_pred = F.interpolate(democ_x_pred, scale_factor=50, mode='linear')
-# econo_x_train = econo_x_train.numpy()
-# econo_x_test = econo_x_test.numpy()
-# econo_x_pred = econo_x_pred.numpy()
-# democ_x_train = democ_x_train.numpy()
-# democ_x_test = democ_x_test.numpy()
-# democ_x_pred = democ_x_pred.numpy()
+econo_x_train = econo_x_train.numpy()
+econo_x_test = econo_x_test.numpy()
+econo_x_pred = econo_x_pred.numpy()
+democ_x_train = democ_x_train.numpy()
+democ_x_test = democ_x_test.numpy()
+democ_x_pred = democ_x_pred.numpy()
 # print(econo_x_r2.shape, congressmember_y_r2.shape)
 # print(econo_x_predic.shape, congressmember_y_predic.shape)
 #프레지던트 y 시그모이드, 콩그래스멤버 리니어
@@ -170,9 +170,13 @@ democ = Reshape((5,150))(democ)
 
 #merge
 president = concatenate((econo,democ))
+president = LSTM(80, return_sequences=True)(president)
+president = LSTM(800, return_sequences=True)(president)
+president = LSTM(800, return_sequences=True)(president)
+president = LSTM(80, return_sequences=True)(president)
 president = LSTM(80)(president)
 # president = Flatten()(president)
-president = Dense(20,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
 president = Dropout(0.2)(president)
 president = Dense(20,activation='elu')(president)
 president = Dense(100)(president)
@@ -180,6 +184,7 @@ president = Reshape((5,20))(president)
 president = LSTM(1,return_sequences=True,activation='sigmoid')(president)
 
 congress = concatenate((econo,democ))
+congress = LSTM(80,return_sequences=True)(congress)
 congress = LSTM(80)(congress)
 congress = Flatten()(congress)
 congress = Dense(300,activation='relu')(congress)
@@ -192,14 +197,14 @@ congress = LSTM(4,return_sequences=True,activation='relu')(congress)
 model = Model(inputs=[econo,democ], outputs=[president,congress],)
 model.summary()
 
-# model.load_weights('c:/project/개인1/npy, weight 저장/2/weight.h5')
+# model.load_weights('c:/project/개인1/npy, weight 저장/4/weight.h5')
 
 model.compile(loss=['binary_crossentropy','mae'], optimizer='rmsprop')
 hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=30000,batch_size=10, 
                  validation_split=0.1,
                  callbacks=[es,mc])
 
-model.save_weights('c:/project/개인1/npy, weight 저장/3/weight.h5')
+model.save_weights('c:/project/개인1/npy, weight 저장/4 tensor/weight.h5')
 
 
 loss = model.evaluate([econo_x_test,democ_x_test],[president_y_test,congressmember_y_test])

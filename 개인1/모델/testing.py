@@ -105,5 +105,11 @@ from torch import nn
 import torch.nn.functional as F
 import tensorflow as tf
 print(type(econo_x_train))
-econo_x_train = np.array(econo_x_train)
+econo_x_train = torch.tensor(econo_x_train)
 econo_x_train = F.interpolate(econo_x_train, scale_factor=50, mode='linear')
+from scipy.interpolate import griddata
+grid_z0 = griddata(points, values, (grid_x, grid_y), method='nearest')
+from scipy import interpolate
+GD1 = interpolate.griddata((x1, y1), newarr.ravel(),
+                          (xx, yy),
+                             method='cubic')
