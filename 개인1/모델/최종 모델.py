@@ -128,7 +128,7 @@ democ_x_pred = democ_x_pred.numpy()
 from keras.models import Model, load_model
 from keras.layers import Input, Dense, Conv1D, Conv2D, Flatten, Reshape,ReLU, LSTM, GRU, concatenate,Dropout,MaxPooling1D,MaxPooling2D
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-es = EarlyStopping(monitor='val_loss', patience=600,mode='auto',restore_best_weights=True,verbose=1)
+es = EarlyStopping(monitor='val_loss', patience=150,mode='auto',restore_best_weights=True,verbose=1)
 mc = ModelCheckpoint('bestmodel.hdf5',monitor='val_loss',mode='min',save_best_only=True)
 #모델1
 econo = Input(shape=(5,150))
@@ -171,40 +171,39 @@ democ = Reshape((5,150))(democ)
 #merge
 president = concatenate((econo,democ))
 president = LSTM(80, return_sequences=True)(president)
-president = LSTM(800, return_sequences=True)(president)
-president = LSTM(800, return_sequences=True)(president)
-president = LSTM(80, return_sequences=True)(president)
 president = LSTM(80)(president)
 # president = Flatten()(president)
 president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
+president = Dense(200,activation='tanh')(president)
 president = Dropout(0.2)(president)
-president = Dense(20,activation='elu')(president)
+president = Dense(200,activation='elu')(president)
 president = Dense(100)(president)
 president = Reshape((5,20))(president)
 president = LSTM(1,return_sequences=True,activation='sigmoid')(president)
 
 congress = concatenate((econo,democ))
-congress = LSTM(80,return_sequences=True)(congress)
 congress = LSTM(80)(congress)
 congress = Flatten()(congress)
-congress = Dense(300,activation='relu')(congress)
-congress = Dense(200,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
+congress = Dense(800,activation='relu')(congress)
 congress = Dropout(0.4)(congress)
-congress = Dense(25)(congress)
-congress = Reshape((5,5))(congress)
-congress = LSTM(4,return_sequences=True,activation='relu')(congress)
+congress = Dense(80)(congress)
+congress = Reshape((5,16))(congress)
+congress = LSTM(4,activation='relu',return_sequences=True)(congress)
 
 model = Model(inputs=[econo,democ], outputs=[president,congress],)
 model.summary()
 
-# model.load_weights('c:/project/개인1/npy, weight 저장/4/weight.h5')
+model.load_weights('c:/project/개인1/npy, weight 저장/5/weight.h5')
 
-model.compile(loss=['binary_crossentropy','mae'], optimizer='rmsprop')
-hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=30000,batch_size=10, 
-                 validation_split=0.1,
-                 callbacks=[es,mc])
+model.compile(loss=['binary_crossentropy','mae'], optimizer='AdaMax')
+# hist = model.fit([econo_x_train,democ_x_train],[president_y_train,congressmember_y_train],epochs=30000,batch_size=10, 
+#                  validation_split=0.1,
+#                  callbacks=[es,mc])
 
-model.save_weights('c:/project/개인1/npy, weight 저장/4 tensor/weight.h5')
+# model.save_weights('c:/project/개인1/npy, weight 저장/5/weight.h5')
 
 
 loss = model.evaluate([econo_x_test,democ_x_test],[president_y_test,congressmember_y_test])
@@ -276,12 +275,14 @@ print('r2_score', congress_r2_score)
 print(np.where(pred_presi[0][-1]>=0.5,'27년 대선에서는 야당후보가 당선됩니다','27년 대선에서는 여당후보가 당선됩니다'))
 # print(pred[1][-4].round())
 total_congress = pred_congress[1][-4][0].round()+pred_congress[1][-4][1].round()+pred_congress[1][-4][2].round()+pred_congress[1][-4][3].round()
-print('24년 총선에서 민주당계는',(pred_congress[1][-4][0].round()).astype(int),'명,','보수당계는',(pred_congress[1][-4][1].round()).astype(int),'명,','진보당계',(pred_congress[1][-4][2].round()).astype(int),'명,','무소속', (pred_congress[1][-4][3].round()).astype(int),'명이 당선 됩니다.')
+print('24년 총선에서 민주당계는',(pred_congress[1][-4][0].round()).astype(int),'명,','보수당계는',(pred_congress[1][-4][1].round()).astype(int),'명,','진보당계',(pred_congress[1][-4][2].round()).astype(int),'명,','무소속', (pred_congress[1][-4][3].round()).astype(int),'명',
+      '기타 21명','합계', (total_congress).astype(int) 
+      +21,'명'      )
 
 
 
 
-print('합계', (total_congress).astype(int),'명', '기타8명')
+# print('합계', (total_congress).astype(int),'명', '기타21명')
 
 # print(pred.shape)
 
